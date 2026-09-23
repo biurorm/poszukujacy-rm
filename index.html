@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#094d47">
+  <title>Poszukujący, RM Nieruchomości</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="header-left">
+      <img src="logo.png" alt="RM Nieruchomości" class="header-logo">
+      <div class="subtitle" id="header-subtitle">Poszukujący</div>
+    </div>
+    <button class="back" id="back-btn" style="display:none">← Wstecz</button>
+  </header>
+
+  <!-- ============ LISTA ============ -->
+  <section class="screen active" id="screen-list">
+
+    <div class="stats" id="stats"></div>
+
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="Szukaj: nazwisko, telefon, lokalizacja, notatka">
+      <select id="filter-status">
+        <option value="">Wszystkie statusy</option>
+        <option value="Nowy">Nowy</option>
+        <option value="Szukam">Szukam</option>
+        <option value="Wysłana oferta">Wysłana oferta</option>
+        <option value="Po prezentacji">Po prezentacji</option>
+        <option value="Kupił">Kupił</option>
+        <option value="Odpadł">Odpadł</option>
+      </select>
+      <select id="filter-sort">
+        <option value="callback">Sortuj: kto czeka na telefon</option>
+        <option value="new">Sortuj: najnowsze</option>
+        <option value="budget">Sortuj: budżet malejąco</option>
+        <option value="name">Sortuj: nazwisko</option>
+      </select>
+    </div>
+
+    <div id="list"></div>
+
+    <div class="list-footer">
+      <button class="btn-ghost" id="btn-export">📤 Eksport na komputer</button>
+      <button class="btn-ghost" id="btn-backup">💾 Kopia / przywracanie</button>
+    </div>
+  </section>
+
+  <!-- ============ FORMULARZ ============ -->
+  <section class="screen" id="screen-form">
+    <form id="form" autocomplete="off">
+      <input type="hidden" id="f-id">
+
+      <div class="card">
+        <div class="card-title">1. Numer</div>
+        <div class="tel-row">
+          <input type="tel" id="f-telefon" inputmode="tel" placeholder="668 169 986">
+          <button type="button" class="btn-paste" id="btn-paste">📋 Wklej</button>
+        </div>
+        <div id="dup-box"></div>
+        <label class="mini">Imię (można zostawić puste)
+          <input type="text" id="f-imie" placeholder="np. Anna">
+        </label>
+      </div>
+
+      <div class="card">
+        <div class="card-title">2. W sprawie czego dzwoni</div>
+        <div class="chips" id="chips-powod"></div>
+        <div class="chips chips-history" id="chips-zrodlo"></div>
+        <label class="mini">Oferta, adres, skąd ma numer
+          <input type="text" id="f-zrodlo" placeholder="np. Fromborska 8">
+        </label>
+      </div>
+
+      <div class="card">
+        <div class="card-title">3. Czego szuka</div>
+        <div class="chips" id="chips-typ"></div>
+        <div class="chips chips-history" id="chips-lokalizacja"></div>
+        <label class="mini">Lokalizacja
+          <input type="text" id="f-lokalizacja" placeholder="np. Elbląg, Zawodzie">
+        </label>
+      </div>
+
+      <div class="card">
+        <div class="card-title">4. Budżet</div>
+        <div class="chips" id="chips-budzet"></div>
+        <div class="row">
+          <label class="mini">Dokładnie do (zł)
+            <input type="text" id="f-budzet" inputmode="numeric" placeholder="450 000">
+          </label>
+          <label class="mini">Metraż od (m²)
+            <input type="text" id="f-metraz" inputmode="numeric" placeholder="45">
+          </label>
+        </div>
+        <div class="row">
+          <label class="mini">Pokoje
+            <input type="text" id="f-pokoje" placeholder="np. 2-3">
+          </label>
+          <label class="mini">Piętro / uwagi
+            <input type="text" id="f-detale" placeholder="np. bez parteru">
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">5. Jak kupuje i kiedy</div>
+        <div class="chips" id="chips-finansowanie"></div>
+        <div class="chips" id="chips-termin"></div>
+        <label class="check">
+          <input type="checkbox" id="f-sprzedaje">
+          <span>Musi najpierw sprzedać swoje (to też nasz lead na sprzedaż)</span>
+        </label>
+      </div>
+
+      <div class="card">
+        <div class="card-title">6. Kiedy oddzwonić</div>
+        <div class="quick-dates">
+          <button type="button" class="pill" data-days="1">jutro</button>
+          <button type="button" class="pill" data-days="3">za 3 dni</button>
+          <button type="button" class="pill" data-days="7">za tydzień</button>
+          <button type="button" class="pill" data-days="14">za 2 tyg.</button>
+          <button type="button" class="pill" data-days="30">za miesiąc</button>
+          <button type="button" class="pill" data-days="">wyczyść</button>
+        </div>
+        <div class="row">
+          <label class="mini">Data
+            <input type="date" id="f-kiedy">
+          </label>
+          <label class="mini">Status
+            <select id="f-status">
+              <option>Nowy</option>
+              <option>Szukam</option>
+              <option>Wysłana oferta</option>
+              <option>Po prezentacji</option>
+              <option>Kupił</option>
+              <option>Odpadł</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">7. Notatka</div>
+        <p class="hint">Na iPhone naciśnij mikrofon na klawiaturze i po prostu powiedz, co ustaliliście.</p>
+        <textarea id="f-notatka" rows="3" placeholder="Co powiedział, na co czeka, co obiecałem"></textarea>
+        <label class="check">
+          <input type="checkbox" id="f-zgoda">
+          <span>Zgodził się, żebym odzywał się z ofertami (RODO)</span>
+        </label>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="savebar">
+        <button type="submit" class="btn-primary">✓ Zapisz</button>
+        <button type="button" class="btn-danger" id="btn-delete" style="display:none">Usuń</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============ EKSPORT ============ -->
+  <section class="screen" id="screen-export">
+    <div class="card">
+      <div class="card-title">Eksport na komputer</div>
+      <p class="hint">CSV otwiera się w Excelu. Najprościej: „Udostępnij" i wyślij sobie mailem albo wrzuć na OneDrive.</p>
+      <button class="btn-primary" id="ex-share">📲 Udostępnij plik CSV</button>
+      <button class="btn-ghost" id="ex-download">⬇️ Pobierz plik CSV</button>
+      <button class="btn-ghost" id="ex-copy">📋 Kopiuj wszystko jako tekst</button>
+      <button class="btn-ghost" id="ex-mail">✉️ Wyślij mailem do siebie</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Co wchodzi do eksportu</div>
+      <div class="chips" id="chips-zakres"></div>
+      <p class="hint" id="ex-count"></p>
+    </div>
+  </section>
+
+  <!-- ============ BACKUP ============ -->
+  <section class="screen" id="screen-backup">
+    <div class="card">
+      <div class="card-title">Kopia bezpieczeństwa</div>
+      <p class="hint">Dane siedzą tylko w tym telefonie. Rób kopię co jakiś czas, zwłaszcza przed zmianą telefonu.</p>
+      <button class="btn-primary" id="bk-save">💾 Zapisz kopię (JSON)</button>
+      <label class="file-label">📂 Wczytaj kopię z pliku
+        <input type="file" id="bk-load" accept=".json,application/json">
+      </label>
+      <p class="hint" id="bk-info"></p>
+    </div>
+    <div class="card">
+      <div class="card-title">Czyszczenie</div>
+      <button class="btn-danger" id="bk-clear">Usuń wszystkie kontakty</button>
+    </div>
+  </section>
+
+  <button class="fab" id="fab">+</button>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="app.js?v=2"></script>
+</body>
+</html>
