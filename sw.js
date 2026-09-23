@@ -1,7 +1,7 @@
 // Service Worker, dzialanie offline
 // Strategia: najpierw siec (zeby nowa wersja wchodzila od razu), a gdy brak zasiegu, cache.
-const CACHE = 'poszukujacy-rm-v2';
-const FILES = ['./', './index.html', './style.css', './app.js', './manifest.json', './logo.png', './icons/icon-192.png', './icons/icon-512.png'];
+const CACHE = 'poszukujacy-rm-v3';
+const FILES = ['./', './index.html', './style.css', './app.js', './sync.js', './config.js', './vendor/supabase.js', './manifest.json', './logo.png', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES).catch(() => {})));
@@ -15,6 +15,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  if (new URL(event.request.url).origin !== self.location.origin) return; // baza idzie zawsze na żywo
   event.respondWith(
     fetch(event.request).then(resp => {
       const clone = resp.clone();

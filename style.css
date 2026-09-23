@@ -203,3 +203,11 @@ label.mini input, label.mini select { padding: 10px; font-size: 16px; }
   border-radius: 14px; border: 1px solid var(--border);
 }
 .savebar .btn-primary, .savebar .btn-danger { margin-bottom: 0; }
+
+/* ===== wersja 3: synchronizacja z bazą biura ===== */
+.header-right { display: flex; align-items: center; gap: 8px; }
+.sync-btn {
+  background: rgba(255,255,255,.15); color: #fff; border: 0;
+  padding: 8px 12px; border-radius: 8px; font-size: 14px; white-space: nowrap;
+}
+#screen-sync .btn-primary, #screen-sync .btn-ghost { width: 100%; }

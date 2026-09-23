@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 
@@ -22,7 +22,10 @@
       <img src="logo.png" alt="RM Nieruchomości" class="header-logo">
       <div class="subtitle" id="header-subtitle">Poszukujący</div>
     </div>
-    <button class="back" id="back-btn" style="display:none">← Wstecz</button>
+    <div class="header-right">
+      <button class="sync-btn" id="sync-btn" style="display:none" aria-label="Synchronizacja">☁</button>
+      <button class="back" id="back-btn" style="display:none">← Wstecz</button>
+    </div>
   </header>
 
   <!-- ============ LISTA ============ -->
@@ -190,7 +193,7 @@
   <section class="screen" id="screen-backup">
     <div class="card">
       <div class="card-title">Kopia bezpieczeństwa</div>
-      <p class="hint">Dane siedzą tylko w tym telefonie. Rób kopię co jakiś czas, zwłaszcza przed zmianą telefonu.</p>
+      <p class="hint">Po zalogowaniu kontakty są też w bazie biura (ikona ☁ w nagłówku). Kopia JSON to dodatkowe zabezpieczenie, a bez logowania jedyne, więc wtedy rób ją regularnie.</p>
       <button class="btn-primary" id="bk-save">💾 Zapisz kopię (JSON)</button>
       <label class="file-label">📂 Wczytaj kopię z pliku
         <input type="file" id="bk-load" accept=".json,application/json">
@@ -199,7 +202,36 @@
     </div>
     <div class="card">
       <div class="card-title">Czyszczenie</div>
-      <button class="btn-danger" id="bk-clear">Usuń wszystkie kontakty</button>
+      <button class="btn-danger" id="bk-clear">Usuń kontakty z tego telefonu</button>
+    </div>
+  </section>
+
+  <!-- ============ SYNCHRONIZACJA ============ -->
+  <section class="screen" id="screen-sync">
+    <div class="card">
+      <div class="card-title">Baza biura</div>
+      <p class="hint" id="sync-info"></p>
+      <div id="sync-konto" style="display:none">
+        <button class="btn-primary" id="sync-teraz">🔄 Synchronizuj teraz</button>
+        <button class="btn-ghost" id="sync-wyloguj">Wyloguj</button>
+      </div>
+    </div>
+    <div class="card" id="sync-login" style="display:none">
+      <div class="card-title">Zaloguj się (konto z Zadań RM)</div>
+      <form id="sync-form">
+        <label class="mini">E-mail
+          <input type="email" id="sync-email" autocomplete="username" required>
+        </label>
+        <label class="mini">Hasło
+          <input type="password" id="sync-haslo" autocomplete="current-password" required>
+        </label>
+        <button type="submit" class="btn-primary">Zaloguj</button>
+      </form>
+      <p class="hint" id="sync-msg"></p>
+    </div>
+    <div class="card">
+      <div class="card-title">Jak to działa</div>
+      <p class="hint">Kontakt zapisuje się najpierw w telefonie, więc wszystko działa też bez zasięgu. Gdy jest sieć, leci do bazy biura, a zmiany z komputera i od asystentki przychodzą same. Ikona w nagłówku: ☁ ✓ wszystko wysłane, ⏳ wysyłam, 📴 brak zasięgu (zmiany czekają).</p>
     </div>
   </section>
 
@@ -209,6 +241,9 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="app.js?v=2"></script>
+<script src="config.js?v=3"></script>
+<script src="vendor/supabase.js"></script>
+<script src="app.js?v=3"></script>
+<script src="sync.js?v=3"></script>
 </body>
 </html>

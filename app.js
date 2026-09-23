@@ -84,7 +84,7 @@ function show(name) {
   $('back-btn').style.display = name === 'list' ? 'none' : 'block';
   $('fab').style.display = name === 'list' ? 'block' : 'none';
   $('header-subtitle').textContent = {
-    list: 'Poszukujący', form: 'Kontakt', export: 'Eksport', backup: 'Kopia'
+    list: 'Poszukujący', form: 'Kontakt', export: 'Eksport', backup: 'Kopia', sync: 'Synchronizacja'
   }[name] || 'Poszukujący';
   window.scrollTo(0, 0);
 }
@@ -214,6 +214,7 @@ function render() {
                : (k.kiedy ? '<span class="badge">telefon ' + esc(dataPL(k.kiedy)) + '</span>' : '')) +
           (k.finansowanie ? '<span class="badge">' + esc(k.finansowanie) + '</span>' : '') +
           (k.termin ? '<span class="badge">' + esc(k.termin) + '</span>' : '') +
+          (k.dodal ? '<span class="badge">wpisał(a): ' + esc(k.dodal) + '</span>' : '') +
         '</div>' +
         (k.notatka ? '<div class="item-note">' + esc(k.notatka) + '</div>' : '') +
         '<div class="item-actions">' +
@@ -303,6 +304,7 @@ function zbierz() {
   const id = $('f-id').value;
   const stary = db.filter(x => x.id === id)[0];
   const baza = stary ? Object.assign({}, stary) : pusty();
+  if (!stary && !baza.dodal && window.Sync && Sync.zalogowany()) baza.dodal = Sync.imie();
   return Object.assign(baza, {
     id: id,
     telefon: formatTel($('f-telefon').value),
@@ -447,6 +449,7 @@ function init() {
     for (let j = 0; j < db.length; j++) { if (db[j].id === k.id) { i = j; break; } }
     if (i >= 0) db[i] = k; else db.unshift(k);
     save();
+    if (window.Sync) Sync.zmiana(k.id);
     render();
     show('list');
     toast('Zapisane');
@@ -457,6 +460,7 @@ function init() {
     if (!confirm('Usunąć ten kontakt na stałe?')) return;
     db = db.filter(x => x.id !== id);
     save();
+    if (window.Sync) Sync.usun(id);
     render();
     show('list');
     toast('Usunięte');
@@ -514,6 +518,7 @@ function init() {
         const nowe = dane.filter(x => x && x.id && znane.indexOf(x.id) < 0);
         db = db.concat(nowe);
         save();
+        if (window.Sync && nowe.length) Sync.zmiana.apply(null, nowe.map(x => x.id));
         render();
         toast('Dopisano ' + nowe.length + ' kontaktów');
         $('bk-info').textContent = 'W pamięci telefonu: ' + db.length + ' kontaktów.';
@@ -523,8 +528,11 @@ function init() {
     r.readAsText(f);
   };
   $('bk-clear').onclick = () => {
-    if (!confirm('Usunąć WSZYSTKIE kontakty z telefonu? Tego nie da się cofnąć.')) return;
-    if (!confirm('Na pewno? Najpierw zrób kopię JSON.')) return;
+    const wBazie = window.Sync && Sync.zalogowany();
+    if (!confirm(wBazie
+      ? 'Usunąć kontakty z pamięci TEGO telefonu? W bazie biura zostają i wrócą przy następnej synchronizacji.'
+      : 'Usunąć WSZYSTKIE kontakty z telefonu? Tego nie da się cofnąć.')) return;
+    if (!wBazie && !confirm('Na pewno? Najpierw zrób kopię JSON.')) return;
     db = [];
     save();
     render();
