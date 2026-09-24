@@ -1,5 +1,9 @@
 /* Poszukujący, RM Nieruchomości — aplikacja do zapisywania kontaktów po rozmowie */
 
+// numer wersji widoczny w zielonym pasku; podbijać razem z ?v= w index.html i CACHE w sw.js
+const WERSJA = 5;
+document.querySelectorAll('[data-wersja]').forEach(el => { el.textContent = 'v' + WERSJA; });
+
 const KEY = 'rm-poszukujacy-v1';
 const POWODY = ['Oferta sprzedana', 'Jest przedwstępna', 'Nie mam takiej oferty', 'Z reklamy', 'Polecenie', 'Wizytówka Google'];
 const TYPY = ['Mieszkanie', 'Dom', 'Działka', 'Lokal', 'Inwestycja', 'Najem'];
@@ -543,7 +547,15 @@ function init() {
   show('list');
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    // nowa wersja przejęła aplikację: przeładuj, ale nie w trakcie wpisywania (wtedy przy następnym otwarciu)
+    const byloSterowane = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!byloSterowane) return;
+      const pisze = document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+      if (!pisze) { location.reload(); return; }
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') location.reload(); }, { once: true });
+    });
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
   }
 }
 

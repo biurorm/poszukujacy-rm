@@ -1,10 +1,10 @@
 // Service Worker, dzialanie offline
 // Strategia: najpierw siec (zeby nowa wersja wchodzila od razu), a gdy brak zasiegu, cache.
-const CACHE = 'poszukujacy-rm-v4';
+const CACHE = 'poszukujacy-rm-v5';
 const FILES = ['./', './index.html', './style.css', './app.js', './sync.js', './config.js', './vendor/supabase.js', './manifest.json', './logo.png', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES).catch(() => {})));
+  event.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(u => new Request(u, { cache: 'reload' }))).catch(() => {})));
   self.skipWaiting();
 });
 
