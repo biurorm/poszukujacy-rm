@@ -1,7 +1,7 @@
 /* Poszukujący, RM Nieruchomości — aplikacja do zapisywania kontaktów po rozmowie */
 
 // numer wersji widoczny w zielonym pasku; podbijać razem z ?v= w index.html i CACHE w sw.js
-const WERSJA = 5;
+const WERSJA = 6;
 document.querySelectorAll('[data-wersja]').forEach(el => { el.textContent = 'v' + WERSJA; });
 
 const KEY = 'rm-poszukujacy-v1';

@@ -183,7 +183,7 @@ const Sync = (function () {
       const m = document.getElementById('sync-msg');
       m.textContent = 'Loguję…';
       try {
-        await zaloguj(document.getElementById('sync-email').value.trim(), document.getElementById('sync-haslo').value);
+        await zaloguj(document.getElementById('sync-email').value.trim().toLowerCase(), document.getElementById('sync-haslo').value);
         m.textContent = '';
         toast('Zalogowano, wysyłam kontakty do bazy');
       } catch (err) { m.textContent = /invalid/i.test(err.message) ? 'Zły e-mail albo hasło.' : 'Nie udało się: ' + err.message; }
